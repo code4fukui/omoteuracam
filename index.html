@@ -1,0 +1,91 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="icon" href="data:">
+<title>omoteuracam</title>
+</head><body>
+<h1>omoteuracam</h1>
+<canvas id=canvas></canvas>
+<video id=videoElement style="display:none"></video>
+<button id=btn>START</button><br>
+<button id=btndownload disabled>DOWNLOAD</button>
+<hr>
+<a href=https://github.com/code4fukui/omoteuracam/>src on GitHub</a>
+
+<script type="module">
+import { Camera } from "https://code4fukui.github.io/Camera/Camera.js";
+
+const aspect = Math.sqrt(2);
+
+const cw = canvas.width = 1220;
+const ch = canvas.height = cw / 2 * aspect;
+const g = canvas.getContext("2d");
+
+const camera = new Camera(videoElement, {
+  onFrame: async () => {
+    // use videoElement as image
+    const vh = videoElement.videoHeight;
+    const vw = videoElement.videoWidth;
+    const imgaspect = vh / vw;
+    const dx = (state - 1) * cw / 2;
+      console.log(vw, vh, imgaspect, aspect);
+    if (imgaspect > aspect) {
+      const h = vw * aspect;
+      const y = (vh - h) / 2;
+      g.drawImage(videoElement, 0, y, vw, h, dx, 0, cw / 2, ch);
+    } else {
+      const w = vh / aspect;
+      const x = (vw - w) / 2;
+      g.drawImage(videoElement, x, 0, w, vh, dx, 0, cw / 2, ch);
+    }
+  },
+  width: 1280,
+  height: 720,
+  backcamera: true,
+});
+
+const downloadJPEG = (canvas) => {
+  const dataURL = canvas.toDataURL("image/jpeg");
+  const link = document.createElement("a");
+  link.href = dataURL;
+  link.download = "image.jpg";
+  link.click();
+};
+
+let state = 0;
+btn.onclick = () => {
+  if (state == 0) {
+    btn.textContent = "SHOT 1";
+    camera.start();
+    state++;
+  } else if (state == 1) {
+    btn.textContent = "SHOT 2";
+    camera.start();
+    state++;
+  } else if (state == 2) {
+    camera.stop();
+    btn.textContent = "START";
+    btndownload.disabled = false;
+    btndownload.onclick = () => {
+      downloadJPEG(canvas);
+    };
+    state = 0;
+  }
+};
+</script>
+
+<style>
+body {
+  font-family: sans-serif;
+  text-align: center;
+}
+button {
+  margin: .5em;
+  padding: .5em 2em;
+  width: 10em;
+}
+canvas {
+  width: 100%;
+  border: 1px solid gray;
+}
+a {
+  color: gray;
+}
+</style>
