@@ -25,7 +25,6 @@ const camera = new Camera(videoElement, {
     const vw = videoElement.videoWidth;
     const imgaspect = vh / vw;
     const dx = (state - 1) * cw / 2;
-      console.log(vw, vh, imgaspect, aspect);
     if (imgaspect > aspect) {
       const h = vw * aspect;
       const y = (vh - h) / 2;
@@ -57,7 +56,6 @@ btn.onclick = () => {
     state++;
   } else if (state == 1) {
     btn.textContent = "SHOT 2";
-    camera.start();
     state++;
   } else if (state == 2) {
     camera.stop();
